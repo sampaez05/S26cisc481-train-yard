@@ -38,6 +38,64 @@ const STATE_1: State = [
     ["d"]
 ];
 
+//example Initial State from the assignment
+const STATE_1_5: State = [
+    [],
+    ["e"],
+    ["a","*"],
+    ["b","c"],
+    [],
+    ["d"]
+];
+
+const YARD_2: Yard = {
+    1: [2,3],
+    2: [4,5],
+    3: [5],
+    4: [6],
+    5: [6,7],
+    6: [8],
+    7: [8],
+    8: []
+};
+
+const STATE_2: State = [
+    ["*","a"],
+    ["b"],
+    [],
+    [],
+    ["c"],
+    [],
+    ["d"],
+    []
+];
+
+const STATE_2_5: State = [
+    ["a"],
+    ["b"],
+    [],
+    ["*"],
+    ["c","d"],
+    [],
+    [],
+    []
+];
+
+const YARD_3: Yard = {
+    1:[2],
+    2: []
+};
+
+const STATE_3: State = [
+    ["a","*","b"],
+    ["c", "d"]
+];
+const STATE_3_5: State = [
+    ["a","b"],
+    ["c","*","d"]
+];
+
+
 function checkForEngine(state:State):number{
     for (let i=0; i< state.length; i++){
         if (state[i].includes("*")){
@@ -105,4 +163,17 @@ function possibleActions(yard:Yard, state:State):Action[]{
     return actions;
 }
 
+console.log("Yard 1, State 1: ")
 possibleActions(YARD_1,STATE_1);
+console.log("Yard 1, State 1_5: ")
+possibleActions(YARD_1,STATE_1_5);
+
+console.log("Yard 2, State 2: ")
+possibleActions(YARD_2,STATE_2);
+console.log("Yard 2, State 2_5: ")
+possibleActions(YARD_2,STATE_2_5);
+
+console.log("Yard 3, State 3: ")
+possibleActions(YARD_3,STATE_3);
+console.log("Yard 3, State 3_5: ")
+possibleActions(YARD_3,STATE_3_5);
