@@ -18,7 +18,7 @@ type Yard = {
   [track: number]: Track[];
 };
 
-//example Train Yard from the assignment
+//example Train Yard 1 from the assignment
 const YARD_1: Yard = {
   1: [2, 3],
   2: [6],
@@ -28,7 +28,7 @@ const YARD_1: Yard = {
   6: []
 };
 
-//example Initial State from the assignment
+//example Initial State 1 from the assignment
 const STATE_1: State = [
     ["*"],
     ["e"],
@@ -38,7 +38,7 @@ const STATE_1: State = [
     ["d"]
 ];
 
-//example Initial State from the assignment
+//example Initial State I made up
 const STATE_1_5: State = [
     [],
     ["e"],
@@ -48,6 +48,7 @@ const STATE_1_5: State = [
     ["d"]
 ];
 
+//example yard I made up
 const YARD_2: Yard = {
     1: [2,3],
     2: [4,5],
@@ -59,6 +60,7 @@ const YARD_2: Yard = {
     8: []
 };
 
+//example state I made up
 const STATE_2: State = [
     ["*","a"],
     ["b"],
@@ -70,6 +72,7 @@ const STATE_2: State = [
     []
 ];
 
+//example state I made up
 const STATE_2_5: State = [
     ["a"],
     ["b"],
@@ -81,19 +84,68 @@ const STATE_2_5: State = [
     []
 ];
 
+//example yard from the actions part of the assignmen
 const YARD_3: Yard = {
     1:[2],
     2: []
 };
-
+//example Initial State from the actions part of the assignment
 const STATE_3: State = [
     ["a","*","b"],
     ["c", "d"]
 ];
+//example state I made up
 const STATE_3_5: State = [
     ["a","b"],
     ["c","*","d"]
 ];
+
+//example yard 3 from the assignment
+const YARD_4: Yard = {
+    1:[2,3],
+    2:[],
+    3:[]
+};
+
+//example state for yard 3 from the assignment
+const STATE_4: State = [
+    ["*"],
+    ["a"],
+    ["b"]
+];
+
+//example yard 4 from the assignment
+const YARD_5: Yard = {
+    1:[2,3,4],
+    2:[],
+    3:[],
+    4:[]
+};
+
+//example state for yard 4 from the assignment
+const STATE_5: State = [
+    ["*"],
+    ["a"],
+    ["b","c"],
+    ["d"]
+];
+
+//example yard 5 from the assignment
+const YARD_6: Yard = {
+    1:[2,3,4],
+    2:[],
+    3:[],
+    4:[]
+};
+
+//example state for yard 5 from the assignment
+const STATE_6: State = [
+    ["*"],
+    ["a"],
+    ["c","b"],
+    ["d"]
+];
+
 
 
 function checkForEngine(state:State):number{
@@ -268,3 +320,5 @@ console.log("State 3, Yard 3: ")
 expand(STATE_3,YARD_3);
 console.log("State 3_5, Yard 3: ")
 expand(STATE_3_5,YARD_3);
+
+//problem 4
