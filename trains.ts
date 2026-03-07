@@ -144,7 +144,7 @@ const STATE_5: State = [
 ];
 //example goal state for yard 4 from the assignment
 const GOAL_STATE_5: State = [
-    ["*","b","c","d"],
+    ["*","a","b","c","d"],
     [],
     [],
     []
@@ -167,7 +167,7 @@ const STATE_6: State = [
 ];
 //example goal state for yard 5 from the assignment
 const GOAL_STATE_6: State = [
-    ["*","b","c","d"],
+    ["*","a","b","c","d"],
     [],
     [],
     []
@@ -319,6 +319,11 @@ result(possibleActions(YARD_3,STATE_3)[0],STATE_3);
 console.log("Yard 3, State 3_5: ")
 result(possibleActions(YARD_3,STATE_3_5)[0],STATE_3_5);
 
+console.log("Yard 5, State 5: ")
+result(possibleActions(YARD_5,STATE_5)[0],STATE_5);
+console.log("Yard 6, State 6: ")
+result(possibleActions(YARD_6,STATE_6)[0],STATE_6);
+
 //problem 3 
 function expand(state:State, yard:Yard):State[]{
     let states:State[] = [];
@@ -347,6 +352,11 @@ expand(STATE_3,YARD_3);
 console.log("State 3_5, Yard 3: ")
 expand(STATE_3_5,YARD_3);
 
+console.log("State 5, Yard 5: ")
+expand(STATE_5,YARD_5);
+console.log("State 6, Yard 6: ")
+expand(STATE_6,YARD_6);
+
 //problem 4
 
 //helper function to help build out our tree
@@ -365,7 +375,7 @@ function expandNode(node:myNode, yard:Yard):myNode[]{
             depth: node.depth+1
         });
     }
-    console.log("The possible states are: ", children);
+    //console.log("The possible states are: ", children);
     return children;
 }
 
@@ -444,4 +454,4 @@ howToGetToGoal(YARD_4,STATE_4,GOAL_STATE_4);
 console.log("Yard 5 - Example Yard 4");
 howToGetToGoal(YARD_5,STATE_5,GOAL_STATE_5);
 console.log("Yard 6 - Example Yard 5");
-howToGetToGoal(YARD_6,STATE_5,GOAL_STATE_6);
+howToGetToGoal(YARD_6,STATE_6,GOAL_STATE_6);
