@@ -173,6 +173,32 @@ const GOAL_STATE_6: State = [
     []
 ];
 
+//example yard 2 from the assignment
+const YARD_7: Yard = {
+    1:[2,5],
+    2:[3,5],
+    3:[],
+    4:[],
+    5:[]
+};
+
+//example state for yard 2 from the assignment
+const STATE_7: State = [
+    ["*"],
+    ["d"],
+    ["b"],
+    ["a","e"],
+    ["c"]
+];
+//example goal state for yard 2 from the assignment
+const GOAL_STATE_7: State = [
+    ["*","a","b","c","d","e"],
+    [],
+    [],
+    [],
+    []
+];
+
 
 function checkForEngine(state:State):number{
     for (let i=0; i< state.length; i++){
@@ -358,6 +384,11 @@ console.log("State 6, Yard 6: ")
 expand(STATE_6,YARD_6);
 
 //problem 4
+/**
+ * The blind tree search method that I chose was depth-limited-search and iterative deepening
+ * I chose this because it finds the optimal solution like breadth-first search but does not require as much memory, making it better than breadth-first search.
+ * It is also better than depth-first search since it finds the optimal solution rather than just the first solution that appears in the search space. 
+ */
 
 //helper function to help build out our tree
 function expandNode(node:myNode, yard:Yard):myNode[]{
@@ -455,3 +486,5 @@ console.log("Yard 5 - Example Yard 4");
 howToGetToGoal(YARD_5,STATE_5,GOAL_STATE_5);
 console.log("Yard 6 - Example Yard 5");
 howToGetToGoal(YARD_6,STATE_6,GOAL_STATE_6);
+console.log("Yard 7 - Example Yard 2");
+howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
