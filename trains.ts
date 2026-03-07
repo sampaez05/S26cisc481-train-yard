@@ -190,6 +190,9 @@ function result(action:Action, state:State):State{
     //fix indexing 
     let fromTrack = newState[from - 1];
     let toTrack = newState[to - 1];
+    //find index of the engine
+    const engineTrack = checkForEngine(state);
+    const engineIndex = newState[engineTrack - 1].indexOf("*");
     if (direction == "LEFT"){
         // remove leftmost car from the start of the from track
         let movedCar = fromTrack.shift();
@@ -198,12 +201,36 @@ function result(action:Action, state:State):State{
             toTrack.push(movedCar);
         }
     }
-    if (direction == "RIGHT"){
+    /*
+    if (direction == "RIGHT"){  
         // remove rightmost car from the end of the from track
-        let movedCar = fromTrack.pop();
+        let movedCar;
+        if (fromTrack[fromTrack.length-1]=="*"){
+            movedCar = fromTrack.pop();
+        }
+        else{
+            movedCar = fromTrack.splice(-2,1)[0];
+        }
         if (movedCar !== undefined) {
             //put moved card at the start of the destination track
             toTrack.unshift(movedCar);
+        }
+
+    }
+    */
+    if (direction == "RIGHT") {
+        let movedCar;
+        if (fromTrack[fromTrack.length - 1] !== "*") {
+            movedCar = fromTrack.pop();
+            if (movedCar !== undefined) {
+                toTrack.unshift(movedCar);
+            }
+        }
+        else{
+            movedCar = fromTrack.splice(fromTrack.length - 2,1)[0];
+            if (movedCar !== undefined) {
+                toTrack.unshift(movedCar);
+            }
         }
     }
     console.log ("The resulting state is ", newState);
@@ -224,3 +251,29 @@ console.log("Yard 3, State 3: ")
 result(possibleActions(YARD_3,STATE_3)[0],STATE_3);
 console.log("Yard 3, State 3_5: ")
 result(possibleActions(YARD_3,STATE_3_5)[0],STATE_3_5);
+
+//problem 3 
+function expand(state:State, yard:Yard):State[]{
+    let states:State[] = [];
+    let actions = possibleActions(yard,state)
+    for (let action of actions){
+        states.push(result(action,state));
+    }
+    console.log("The possible states are: ", states);
+    return states;
+}
+
+console.log("State 1, Yard 1: ")
+expand(STATE_1,YARD_1);
+console.log("State 1_5, Yard 1: ")
+expand(STATE_1_5,YARD_1);
+
+console.log("State 2, Yard 2: ")
+expand(STATE_2,YARD_2);
+console.log("State 2_5, Yard 2: ")
+expand(STATE_2_5,YARD_2);
+
+console.log("State 3, Yard 3: ")
+expand(STATE_3,YARD_3);
+console.log("State 3_5, Yard 3: ")
+expand(STATE_3_5,YARD_3);
