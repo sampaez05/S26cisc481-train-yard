@@ -13,6 +13,13 @@ interface Action {
   to: Track;
 }
 
+interface myNode {
+    state: State,
+    parent: myNode | null,
+    action: Action | null,
+    depth: number
+}
+
 //Yard is an adjacency list type where each track node has a list of tracks it connects to
 type Yard = {
   [track: number]: Track[];
@@ -113,6 +120,12 @@ const STATE_4: State = [
     ["a"],
     ["b"]
 ];
+//example goal state for yard 3 from the assignment
+const GOAL_STATE_4: State = [
+    ["*","a","b"],
+    [],
+    []
+]
 
 //example yard 4 from the assignment
 const YARD_5: Yard = {
@@ -128,6 +141,13 @@ const STATE_5: State = [
     ["a"],
     ["b","c"],
     ["d"]
+];
+//example goal state for yard 4 from the assignment
+const GOAL_STATE_5: State = [
+    ["*","b","c","d"],
+    [],
+    [],
+    []
 ];
 
 //example yard 5 from the assignment
@@ -145,7 +165,13 @@ const STATE_6: State = [
     ["c","b"],
     ["d"]
 ];
-
+//example goal state for yard 5 from the assignment
+const GOAL_STATE_6: State = [
+    ["*","b","c","d"],
+    [],
+    [],
+    []
+];
 
 
 function checkForEngine(state:State):number{
@@ -213,7 +239,7 @@ function possibleActions(yard:Yard, state:State):Action[]{
         }
         
     }
-    console.log ("Possible actions are", actions);
+    //console.log ("Possible actions are", actions);
     return actions;
 }
 
@@ -274,7 +300,7 @@ function result(action:Action, state:State):State{
             }
         }
     }
-    console.log ("The resulting state is ", newState);
+    //console.log ("The resulting state is ", newState);
     return newState;
 }
 
@@ -302,7 +328,7 @@ function expand(state:State, yard:Yard):State[]{
         //find all resulting states of each possible action
         states.push(result(action,state));
     }
-    console.log("The possible states are: ", states);
+    //console.log("The possible states are: ", states);
     return states;
 }
 
@@ -322,3 +348,100 @@ console.log("State 3_5, Yard 3: ")
 expand(STATE_3_5,YARD_3);
 
 //problem 4
+
+//helper function to help build out our tree
+function expandNode(node:myNode, yard:Yard):myNode[]{
+    let children:myNode[] = [];
+    //find all possible actions from the given state
+    let actions = possibleActions(yard,node.state)
+    //iterate through each possible action
+    for (let action of actions){
+        let newState = result(action,node.state)
+        //find all resulting states of each possible action
+        children.push({
+            state: newState,
+            parent: node,
+            action: action,
+            depth: node.depth+1
+        });
+    }
+    console.log("The possible states are: ", children);
+    return children;
+}
+
+//function to search the tree
+function depthLimitedSearch(node:myNode, goal:State, yard:Yard, limit:number, visited:Map<string, number>):myNode | null{
+    let key = JSON.stringify(node.state);
+    let goalKey = JSON.stringify(goal);
+
+    let prevDepth = visited.get(key);
+
+    if (prevDepth !== undefined && prevDepth <= node.depth){
+        return null;
+    }
+
+    visited.set(key, node.depth);
+    // if we have reached the goal state then return the node
+    if (key === goalKey){
+        return node;
+    }
+    //stop searching once we reach the limit
+    if (node.depth === limit){
+        return null;
+    }
+    //expand the children of the given node 
+    let children = expandNode(node,yard);
+    for (let child of children){
+        //go down the children's subtree until the limit depth
+        let result = depthLimitedSearch(child,goal,yard,limit,visited)
+        if (result !== null){
+            return result;
+        }
+    }
+    return null;
+}
+
+function iterativeDeepeningSeatch(initial:State,goal:State,yard:Yard):myNode | null{
+    //turn the intitial state into the root node
+    let root:myNode = {
+        state:initial,
+        parent: null,
+        action:null,
+        depth:0
+    };
+    //call depth limited search for a series of limits 
+    for (let depth=0;depth<50;depth++){
+        let visited = new Map<string,number>();
+        let result = depthLimitedSearch(root,goal,yard,depth,visited)
+        if (result !== null){
+            return result;
+        }
+    }
+    return null;
+}
+
+function howToGetToGoal(yard:Yard,initial:State,goal:State):Action[]{
+    let actions:Action[] = [];
+    let goalNode = iterativeDeepeningSeatch(initial,goal,yard);
+    //if unable to reach goal node, return an empty set of actions
+    if (goalNode === null){
+        console.log("Goal not found");
+        return [];
+    }
+    //start at the goal node and work backwards to find path of actions
+    let current:myNode | null= goalNode;
+    while (current && current.action !== null){
+        //put the action at the front of the action list 
+        actions.unshift(current.action);
+        current = current.parent;
+    }
+    console.log("The actions to get to the goal state are: ", actions)
+    return actions; 
+}
+
+console.log("Yard 4 - Example Yard 3");
+howToGetToGoal(YARD_4,STATE_4,GOAL_STATE_4);
+console.log("Yard 5 - Example Yard 4");
+howToGetToGoal(YARD_5,STATE_5,GOAL_STATE_5);
+console.log("Yard 6 - Example Yard 5");
+howToGetToGoal(YARD_6,STATE_5,GOAL_STATE_6);
