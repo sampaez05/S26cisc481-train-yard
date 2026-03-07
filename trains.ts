@@ -488,3 +488,11 @@ console.log("Yard 6 - Example Yard 5");
 howToGetToGoal(YARD_6,STATE_6,GOAL_STATE_6);
 console.log("Yard 7 - Example Yard 2");
 howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
+
+//problem 5
+/**
+ * Because there is also 1 engine in addition to the c cars, there are c+1 objects.
+ * Because the order of these objects matter, there are (c+1)! orderings. 
+ * For each object, there are t possible tracks the object can go on. This results in t^(c+1). This is because there are t choices of tracks that each object can go on.
+ * Thus, the final equation for the total search space is (c+1)! * t^(c+1). 
+ */
