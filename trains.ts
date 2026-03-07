@@ -105,6 +105,8 @@ function checkForEngine(state:State):number{
     return -1;
 }
 
+
+//problem 1
 function possibleActions(yard:Yard, state:State):Action[]{
     let actions:Action[] = [];
     const engineTrack = checkForEngine(state)
@@ -177,3 +179,48 @@ console.log("Yard 3, State 3: ")
 possibleActions(YARD_3,STATE_3);
 console.log("Yard 3, State 3_5: ")
 possibleActions(YARD_3,STATE_3_5);
+
+//problem 2
+function result(action:Action, state:State):State{
+    //copy the state so it can be modified without changing the original
+    let newState:State = state.map(track => [...track]);;
+    let direction = action.direction; //direction as string type
+    let from = action.from; //from track as number
+    let to = action.to; //destination track as number
+    //fix indexing 
+    let fromTrack = newState[from - 1];
+    let toTrack = newState[to - 1];
+    if (direction == "LEFT"){
+        // remove leftmost car from the start of the from track
+        let movedCar = fromTrack.shift();
+        if (movedCar !== undefined) {
+            //put moved card at the end of the destination track
+            toTrack.push(movedCar);
+        }
+    }
+    if (direction == "RIGHT"){
+        // remove rightmost car from the end of the from track
+        let movedCar = fromTrack.pop();
+        if (movedCar !== undefined) {
+            //put moved card at the start of the destination track
+            toTrack.unshift(movedCar);
+        }
+    }
+    console.log ("The resulting state is ", newState);
+    return newState;
+}
+
+console.log("Yard 1, State 1: ")
+result(possibleActions(YARD_1,STATE_1)[0],STATE_1);
+console.log("Yard 1, State 1_5: ")
+result(possibleActions(YARD_1,STATE_1_5)[0],STATE_1_5);
+
+console.log("Yard 2, State 2: ")
+result(possibleActions(YARD_2,STATE_2)[0],STATE_2);
+console.log("Yard 2, State 2_5: ")
+result(possibleActions(YARD_2,STATE_2_5)[0],STATE_2_5);
+
+console.log("Yard 3, State 3: ")
+result(possibleActions(YARD_3,STATE_3)[0],STATE_3);
+console.log("Yard 3, State 3_5: ")
+result(possibleActions(YARD_3,STATE_3_5)[0],STATE_3_5);
