@@ -201,34 +201,23 @@ function result(action:Action, state:State):State{
             toTrack.push(movedCar);
         }
     }
-    /*
-    if (direction == "RIGHT"){  
-        // remove rightmost car from the end of the from track
-        let movedCar;
-        if (fromTrack[fromTrack.length-1]=="*"){
-            movedCar = fromTrack.pop();
-        }
-        else{
-            movedCar = fromTrack.splice(-2,1)[0];
-        }
-        if (movedCar !== undefined) {
-            //put moved card at the start of the destination track
-            toTrack.unshift(movedCar);
-        }
-
-    }
-    */
     if (direction == "RIGHT") {
         let movedCar;
+        //check if last element is not an engine (ie. check if rightmost object is a car)
         if (fromTrack[fromTrack.length - 1] !== "*") {
+            //remove the car from the end of the from track
             movedCar = fromTrack.pop();
             if (movedCar !== undefined) {
+                //insert the car at the front of the destination track
                 toTrack.unshift(movedCar);
             }
         }
+        //if last element is an engine 
         else{
+            //remove the second to last item (which would be the rightmost car) from the from track 
             movedCar = fromTrack.splice(fromTrack.length - 2,1)[0];
             if (movedCar !== undefined) {
+                //insert the car at the front of the destination track
                 toTrack.unshift(movedCar);
             }
         }
@@ -255,8 +244,10 @@ result(possibleActions(YARD_3,STATE_3_5)[0],STATE_3_5);
 //problem 3 
 function expand(state:State, yard:Yard):State[]{
     let states:State[] = [];
+    //find all possible actions from the given state
     let actions = possibleActions(yard,state)
     for (let action of actions){
+        //find all resulting states of each possible action
         states.push(result(action,state));
     }
     console.log("The possible states are: ", states);
