@@ -176,7 +176,7 @@ const GOAL_STATE_6: State = [
 //example yard 2 from the assignment
 const YARD_7: Yard = {
     1:[2,5],
-    2:[3,5],
+    2:[3,4],
     3:[],
     4:[],
     5:[]
@@ -243,7 +243,7 @@ function possibleActions(yard:Yard, state:State):Action[]{
                 }
             }
             //checks if the yTrack has an engine on it
-            if (engineTrack==yTrack){
+            else if (engineTrack==yTrack){
                 //check if yTrack also has a car on it
                 if (state[yTrack-1].some(item => item != '*')){
                     //actions are move the car on yTrack to xTrack 
@@ -269,6 +269,8 @@ function possibleActions(yard:Yard, state:State):Action[]{
     return actions;
 }
 
+/* Test to see if it worked:
+
 console.log("Yard 1, State 1: ")
 possibleActions(YARD_1,STATE_1);
 console.log("Yard 1, State 1_5: ")
@@ -283,6 +285,7 @@ console.log("Yard 3, State 3: ")
 possibleActions(YARD_3,STATE_3);
 console.log("Yard 3, State 3_5: ")
 possibleActions(YARD_3,STATE_3_5);
+*/
 
 //problem 2
 function result(action:Action, state:State):State{
@@ -330,6 +333,8 @@ function result(action:Action, state:State):State{
     return newState;
 }
 
+/* Test to see if result() worked
+
 console.log("Yard 1, State 1: ")
 result(possibleActions(YARD_1,STATE_1)[0],STATE_1);
 console.log("Yard 1, State 1_5: ")
@@ -349,6 +354,7 @@ console.log("Yard 5, State 5: ")
 result(possibleActions(YARD_5,STATE_5)[0],STATE_5);
 console.log("Yard 6, State 6: ")
 result(possibleActions(YARD_6,STATE_6)[0],STATE_6);
+*/
 
 //problem 3 
 function expand(state:State, yard:Yard):State[]{
@@ -362,6 +368,7 @@ function expand(state:State, yard:Yard):State[]{
     //console.log("The possible states are: ", states);
     return states;
 }
+/* Test to see if expand() worked
 
 console.log("State 1, Yard 1: ")
 expand(STATE_1,YARD_1);
@@ -382,6 +389,7 @@ console.log("State 5, Yard 5: ")
 expand(STATE_5,YARD_5);
 console.log("State 6, Yard 6: ")
 expand(STATE_6,YARD_6);
+*/
 
 //problem 4
 /**
