@@ -404,6 +404,7 @@ function expandNode(node:myNode, yard:Yard):myNode[]{
     //find all possible actions from the given state
     let actions = possibleActions(yard,node.state)
     //iterate through each possible action
+    /*
     for (let action of actions){
         let newState = result(action,node.state)
         //find all resulting states of each possible action
@@ -412,6 +413,23 @@ function expandNode(node:myNode, yard:Yard):myNode[]{
             parent: node,
             action: action,
             depth: node.depth+1
+        });
+    }
+    */
+    for (let action of actions){
+        if (
+            node.action &&
+            action.from === node.action.to &&
+            action.to === node.action.from
+        ){
+            continue;
+        }
+        let newState = result(action, node.state);
+        children.push({
+            state: newState,
+            parent: node,
+            action: action,
+            depth: node.depth + 1
         });
     }
     //console.log("The possible states are: ", children);
@@ -435,7 +453,7 @@ function depthLimitedSearch(node:myNode, goal:State, yard:Yard, limit:number, vi
         return node;
     }
     //stop searching once we reach the limit
-    if (node.depth === limit){
+    if (node.depth >= limit){
         return null;
     }
     //expand the children of the given node 
@@ -488,6 +506,7 @@ function howToGetToGoal(yard:Yard,initial:State,goal:State):Action[]{
     return actions; 
 }
 
+/*
 console.log("Yard 4 - Example Yard 3");
 howToGetToGoal(YARD_4,STATE_4,GOAL_STATE_4);
 console.log("Yard 5 - Example Yard 4");
@@ -496,6 +515,7 @@ console.log("Yard 6 - Example Yard 5");
 howToGetToGoal(YARD_6,STATE_6,GOAL_STATE_6);
 console.log("Yard 7 - Example Yard 2");
 howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
+*/
 
 //problem 5
 /**
@@ -504,3 +524,162 @@ howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
  * For each object, there are t possible tracks the object can go on. This results in t^(c+1). This is because there are t choices of tracks that each object can go on.
  * Thus, the final equation for the total search space is (c+1)! * t^(c+1). 
  */
+
+//Problem 6
+/**
+ * The type of search I am going to use is IDA*. This is because I already created an iterative deepening program so it would be easy to adjust it to apply A*.
+ * It is also better to do IDA* instead of A* since it uses less memory. 
+ * The heuristic I am going to apply is based on how disordered the cars are. This will be calculated by comparing pairs of adjacent trains and checking if the pairs are correct. 
+ * So, h = number of misplaced cars + cars not on the goal track.  
+ * For example, if the order of cars is supposed to be A B C D E but it is ordered as A C B D on the goal track and E isn't on the goal track then h = 3. 
+ * This is admissable because the heuristic will not be greater than the number of changes needed since each misplaced car would need to be moved at least once. 
+ */
+
+/*
+function heuristic (state:State,goal:State):number{
+    let misplaced = 0;
+    let current = state[0];
+    let goalTrack = goal[0];
+    for (let i=0; i<current.length;i++){
+        if (current[i]!=goalTrack[i]){
+            misplaced++;
+        }
+    }
+    return misplaced;
+}*/
+
+function heuristic(state: State, goal: State): number {
+
+    let goalTrack = goal[0];
+    let currentTrack = state[0];
+
+    let h = 0;
+
+    // count misplaced cars on the goal track
+    for (let i = 0; i < Math.min(goalTrack.length, currentTrack.length); i++) {
+        if (currentTrack[i] !== goalTrack[i]) {
+            if (currentTrack[i] !== "*") {
+                h++;
+            }
+        }
+    }
+
+    // count cars not on goal track
+    for (let i = 1; i < state.length; i++) {
+        h += state[i].length;
+    }
+
+    return h;
+}
+
+//function to search the tree
+function AStarSearch(node:myNode, goal:State, yard:Yard, limit:number, visited:Set<string>):myNode | number | null{
+    let key = JSON.stringify(node.state);
+    let goalKey = JSON.stringify(goal);
+
+    let h = heuristic(node.state,goal);
+
+    if (visited.has(key)) {
+        return null;
+    }
+
+        visited.add(key);
+
+    let f = node.depth + h;
+
+    if (f > limit){
+        visited.delete(key);
+        return f;
+    }
+    // if we have reached the goal state then return the node
+    if (key === goalKey){
+        return node;
+    }
+    
+    let min = Infinity;
+    //expand the children of the given node 
+    let children = expandNode(node,yard);
+    for (let child of children){
+        //go down the children's subtree until the limit depth
+        let result = AStarSearch(child,goal,yard,limit,visited)
+        if (result !== null && typeof result != "number"){
+            return result;
+        }
+        if (typeof result === "number" && result < min){
+            min = result;
+        }
+    }
+    visited.delete(key);
+    return min;
+    
+    /*
+    //expand the children of the given node 
+    let children = expandNode(node,yard);
+    for (let child of children){
+        //go down the children's subtree until the limit depth
+        let result = AStarSearch(child,goal,yard,limit,visited)
+        if (result !== null){
+            return result;
+        }
+    }
+    return null;
+    */
+}
+
+function IDAstar(initial:State,goal:State,yard:Yard):myNode | null | number{
+    //turn the intitial state into the root node
+    let root:myNode = {
+        state:initial,
+        parent: null,
+        action:null,
+        depth:0
+    };
+
+    let limit = heuristic(initial,goal);
+
+    //call depth limited search for a series of limits 
+    while(true){
+        //let visited = new Map<string,number>();
+        let visited = new Set<string>();
+        let result = AStarSearch(root,goal,yard,limit,visited);
+        if (result === null){
+            return null;
+        }
+        if (typeof result != "number"){
+            return result
+        }
+        //increase the limit since result would be a number
+        limit = result;
+    }
+    return null;
+}
+
+function howToGetToGoalIDAStar(yard:Yard,initial:State,goal:State):Action[]{
+    let actions:Action[] = [];
+    let goalNode = IDAstar(initial,goal,yard);
+    //if unable to reach goal node, return an empty set of actions
+    if (goalNode === null){
+        console.log("Goal not found");
+        return [];
+    }
+    //start at the goal node and work backwards to find path of actions
+    if (typeof goalNode != "number"){
+        let current:myNode | null= goalNode;
+        while (current && current.action !== null){
+            //put the action at the front of the action list 
+            actions.unshift(current.action);
+            current = current.parent;
+        }
+    }
+    console.log("The actions to get to the goal state are: ", actions)
+    return actions; 
+}
+
+console.log("Yard 4 - Example Yard 3");
+howToGetToGoalIDAStar(YARD_4,STATE_4,GOAL_STATE_4);
+console.log("Yard 5 - Example Yard 4");
+howToGetToGoalIDAStar(YARD_5,STATE_5,GOAL_STATE_5);
+console.log("Yard 6 - Example Yard 5");
+howToGetToGoalIDAStar(YARD_6,STATE_6,GOAL_STATE_6);
+console.log("Yard 7 - Example Yard 2");
+howToGetToGoalIDAStar(YARD_7,STATE_7,GOAL_STATE_7);
