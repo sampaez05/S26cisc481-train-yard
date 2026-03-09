@@ -209,67 +209,73 @@ function checkForEngine(state:State):number{
     return -1;
 }
 
-
-//problem 1
 function possibleActions(yard:Yard, state:State):Action[]{
     let actions:Action[] = [];
-    const engineTrack = checkForEngine(state)
-    //iterate through the yard to see each track in the yard
+    const engineTrack = checkForEngine(state);
+
+    // add action to list of actions
+    const addAction = (direction:Direction, from:number, to:number) => {
+        //check if the action is not in the actions list already to avoid duplicates
+        if (!actions.some(a => a.direction===direction && a.from===from && a.to===to)){
+            //add the action to the list of actions
+            actions.push({direction, from, to});
+        }
+    };
+    //check every track in the yard 
     for (let track in yard){
-        //xTrack is the particular track we are looking at, i
         const xTrack = Number(track);
-        //connections is a list of what tracks x connects to
         const connections = yard[xTrack];
-        
+
+        //check all tracks connected to the given track
         for (const yTrack of connections){
-            //checks if the xTrack has an engine on it
-            if (engineTrack==xTrack){
-                //check if xTrack also has a car on it
-                if (state[xTrack-1].some(item => item != '*')){
-                    //actions are move the car on xTrack to the yTrack
-                    actions.push({
-                        direction: "RIGHT",
-                        from: xTrack,
-                        to: yTrack
-                    })  
+
+            // if the engine is on the given track, xTrack
+            if (engineTrack === xTrack){
+                //check what items are on that given track
+                const trackItems = state[xTrack-1];
+                // if the rightmost item of the given track is a car, it can be moved right to the connecting track
+                if (trackItems.some(item => item != '*')){
+                    addAction("RIGHT", xTrack, yTrack);
                 }
+                // if the leftmost item on the connecting track is a car, it can be moved left to the given track
                 if (state[yTrack-1].some(item => item != '*')){
-                    //actions are move the car on yTrack to xTrack
-                    actions.push({
-                        direction: "LEFT",
-                        from: yTrack,
-                        to: xTrack
-                    })  
+                    addAction("LEFT", yTrack, xTrack);
+                }
+                // if the rightmost item of the given track is an engine, it can be moved right to the connecting track
+                if (trackItems[trackItems.length-1] === "*"){
+                    addAction("RIGHT", xTrack, yTrack);
+                }
+                // if the leftmost item on the connecting track is an engine, it can be moved left onto the given track
+                if (trackItems[0] === "*"){
+                    addAction("LEFT", xTrack, yTrack);
                 }
             }
-            //checks if the yTrack has an engine on it
-            else if (engineTrack==yTrack){
-                //check if yTrack also has a car on it
-                if (state[yTrack-1].some(item => item != '*')){
-                    //actions are move the car on yTrack to xTrack 
-                    actions.push({
-                        direction: "LEFT",
-                        from: yTrack,
-                        to: xTrack
-                    })  
+            // if the engine is on the connecting track, y track
+            else if (engineTrack === yTrack){
+                // check what items are on the connecting track
+                const trackItems = state[yTrack-1];
+                // if the leftmost item of the connecting track is a car, it can be moved left to the given track
+                if (trackItems.some(item => item != '*')){
+                    addAction("LEFT", yTrack, xTrack);
                 }
+                // if the rightmost item of the given track is a car, it can be moved right to the connecting track
                 if (state[xTrack-1].some(item => item != '*')){
-                    //actions are move the car on xTrack to yTrack 
-                    actions.push({
-                        direction: "RIGHT",
-                        from: xTrack,
-                        to: yTrack
-                    })  
+                    addAction("RIGHT", xTrack, yTrack);
+                }
+                // if the rightmost item of the connecting track is an engine, it can be moved right to the given track
+                if (trackItems[trackItems.length-1] === "*"){
+                    addAction("RIGHT", yTrack, xTrack);
+                }
+                // if the leftmost item of the given track is a car, it can be moved left to the connecting track
+                if (trackItems[0] === "*"){
+                    addAction("LEFT", yTrack, xTrack);
                 }
             }
         }
-        
     }
-    //console.log ("Possible actions are", actions);
     return actions;
 }
-
-/* Test to see if it worked:
+//Test to see if it worked:
 
 console.log("Yard 1, State 1: ")
 possibleActions(YARD_1,STATE_1);
@@ -285,7 +291,7 @@ console.log("Yard 3, State 3: ")
 possibleActions(YARD_3,STATE_3);
 console.log("Yard 3, State 3_5: ")
 possibleActions(YARD_3,STATE_3_5);
-*/
+
 
 //problem 2
 function result(action:Action, state:State):State{
@@ -333,7 +339,7 @@ function result(action:Action, state:State):State{
     return newState;
 }
 
-/* Test to see if result() worked
+//Test to see if result() worked
 
 console.log("Yard 1, State 1: ")
 result(possibleActions(YARD_1,STATE_1)[0],STATE_1);
@@ -354,7 +360,6 @@ console.log("Yard 5, State 5: ")
 result(possibleActions(YARD_5,STATE_5)[0],STATE_5);
 console.log("Yard 6, State 6: ")
 result(possibleActions(YARD_6,STATE_6)[0],STATE_6);
-*/
 
 //problem 3 
 function expand(state:State, yard:Yard):State[]{
@@ -368,7 +373,7 @@ function expand(state:State, yard:Yard):State[]{
     //console.log("The possible states are: ", states);
     return states;
 }
-/* Test to see if expand() worked
+//Test to see if expand() worked
 
 console.log("State 1, Yard 1: ")
 expand(STATE_1,YARD_1);
@@ -389,7 +394,7 @@ console.log("State 5, Yard 5: ")
 expand(STATE_5,YARD_5);
 console.log("State 6, Yard 6: ")
 expand(STATE_6,YARD_6);
-*/
+
 
 //problem 4
 /**
@@ -404,18 +409,6 @@ function expandNode(node:myNode, yard:Yard):myNode[]{
     //find all possible actions from the given state
     let actions = possibleActions(yard,node.state)
     //iterate through each possible action
-    /*
-    for (let action of actions){
-        let newState = result(action,node.state)
-        //find all resulting states of each possible action
-        children.push({
-            state: newState,
-            parent: node,
-            action: action,
-            depth: node.depth+1
-        });
-    }
-    */
     for (let action of actions){
         if (
             node.action &&
@@ -506,7 +499,6 @@ function howToGetToGoal(yard:Yard,initial:State,goal:State):Action[]{
     return actions; 
 }
 
-/*
 console.log("Yard 4 - Example Yard 3");
 howToGetToGoal(YARD_4,STATE_4,GOAL_STATE_4);
 console.log("Yard 5 - Example Yard 4");
@@ -515,7 +507,7 @@ console.log("Yard 6 - Example Yard 5");
 howToGetToGoal(YARD_6,STATE_6,GOAL_STATE_6);
 console.log("Yard 7 - Example Yard 2");
 howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
-*/
+
 
 //problem 5
 /**
@@ -535,26 +527,10 @@ howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
  * This is admissable because the heuristic will not be greater than the number of changes needed since each misplaced car would need to be moved at least once. 
  */
 
-/*
-function heuristic (state:State,goal:State):number{
-    let misplaced = 0;
-    let current = state[0];
-    let goalTrack = goal[0];
-    for (let i=0; i<current.length;i++){
-        if (current[i]!=goalTrack[i]){
-            misplaced++;
-        }
-    }
-    return misplaced;
-}*/
-
 function heuristic(state: State, goal: State): number {
-
     let goalTrack = goal[0];
     let currentTrack = state[0];
-
     let h = 0;
-
     // count misplaced cars on the goal track
     for (let i = 0; i < Math.min(goalTrack.length, currentTrack.length); i++) {
         if (currentTrack[i] !== goalTrack[i]) {
@@ -563,12 +539,10 @@ function heuristic(state: State, goal: State): number {
             }
         }
     }
-
     // count cars not on goal track
     for (let i = 1; i < state.length; i++) {
         h += state[i].length;
     }
-
     return h;
 }
 
@@ -611,19 +585,6 @@ function AStarSearch(node:myNode, goal:State, yard:Yard, limit:number, visited:S
     }
     visited.delete(key);
     return min;
-    
-    /*
-    //expand the children of the given node 
-    let children = expandNode(node,yard);
-    for (let child of children){
-        //go down the children's subtree until the limit depth
-        let result = AStarSearch(child,goal,yard,limit,visited)
-        if (result !== null){
-            return result;
-        }
-    }
-    return null;
-    */
 }
 
 function IDAstar(initial:State,goal:State,yard:Yard):myNode | null | number{
