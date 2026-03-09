@@ -525,6 +525,12 @@ howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
  * So, h = number of misplaced cars + cars not on the goal track.  
  * For example, if the order of cars is supposed to be A B C D E but it is ordered as A C B D on the goal track and E isn't on the goal track then h = 3. 
  * This is admissable because the heuristic will not be greater than the number of changes needed since each misplaced car would need to be moved at least once. 
+ * 
+ * The runtime using the heuristic is much faster than compared to the uninformed search without the heuristic. Even though both using Iterative Deepening, when running the version with
+ * the heuristic, the results show up in the console instantaneously whereas it would take a second when running the version withough the heuristic. 
+ * With the heuristic, the number of nodes expanded is 51,216 (this was found by using a global nodesExpanded variable that was incremented after each node was expanded 
+ * then logged once at the end outside of the function).
+ * Without the heuristic, the number of nodes expanded is 268,750. This is 217,534 nodes more than when the heuristic is used!
  */
 
 function heuristic(state: State, goal: State): number {
@@ -550,14 +556,12 @@ function heuristic(state: State, goal: State): number {
 function AStarSearch(node:myNode, goal:State, yard:Yard, limit:number, visited:Set<string>):myNode | number | null{
     let key = JSON.stringify(node.state);
     let goalKey = JSON.stringify(goal);
-
     let h = heuristic(node.state,goal);
-
     if (visited.has(key)) {
         return null;
     }
 
-        visited.add(key);
+    visited.add(key);
 
     let f = node.depth + h;
 
