@@ -526,10 +526,11 @@ howToGetToGoal(YARD_7,STATE_7,GOAL_STATE_7);
  * For example, if the order of cars is supposed to be A B C D E but it is ordered as A C B D on the goal track and E isn't on the goal track then h = 3. 
  * This is admissable because the heuristic will not be greater than the number of changes needed since each misplaced car would need to be moved at least once. 
  * 
- * The runtime using the heuristic is much faster than compared to the uninformed search without the heuristic. Even though both using Iterative Deepening, when running the version with
- * the heuristic, the results show up in the console instantaneously whereas it would take a second when running the version withough the heuristic. 
- * With the heuristic, the number of nodes expanded is 51,216 (this was found by using a global nodesExpanded variable that was incremented after each node was expanded 
- * then logged once at the end outside of the function).
+ * The time complexity is O(b^d) in the worst case however because of the heuristic, the runtime is much faster. 
+ * Even though both using Iterative Deepening and both have a time complexity of O(b^d), when running the version 
+ * with the heuristic, the results show up in the console instantaneously whereas it would take a second when 
+ * running the version withough the heuristic. With the heuristic, the number of nodes expanded is 51,216 (this was found by using a
+ *  global nodesExpanded variable that was incremented after each node was expanded then logged once at the end outside of the function).
  * Without the heuristic, the number of nodes expanded is 268,750. This is 217,534 nodes more than when the heuristic is used!
  */
 
@@ -648,3 +649,105 @@ console.log("Yard 6 - Example Yard 5");
 howToGetToGoalIDAStar(YARD_6,STATE_6,GOAL_STATE_6);
 console.log("Yard 7 - Example Yard 2");
 howToGetToGoalIDAStar(YARD_7,STATE_7,GOAL_STATE_7);
+
+
+// problem 7
+/**
+ * The time complexity is O(b^d) in the worst case however because it uses number of unique states, 
+ * significantly less nodes are expanded.The number of nodes expanded was 16,908 which is 34,308 less 
+ * nodes than the heuristic tree search and 251,842 less nodes than the non-heuristic tree search. 
+ */
+//function to search the graph
+function AStarGraphSearch(node:myNode, goal:State, yard:Yard, limit:number, visited: Map<string, number>):myNode | number | null{
+    let key = JSON.stringify(node.state);
+    let goalKey = JSON.stringify(goal);
+    let h = heuristic(node.state,goal);
+    // graph search check
+    if (visited.has(key) && visited.get(key)! <= node.depth) {
+        return null;
+    }
+
+    visited.set(key, node.depth);
+
+    let f = node.depth + h;
+
+    if (f > limit){
+        return f;
+    }
+    // if we have reached the goal state then return the node
+    if (key === goalKey){
+        return node;
+    }
+    
+    let min = Infinity;
+    //expand the children of the given node 
+    let children = expandNode(node,yard);
+    for (let child of children){
+        //go down the children's subtree until the limit depth
+        let result = AStarGraphSearch(child,goal,yard,limit,visited)
+        if (result !== null && typeof result != "number"){
+            return result;
+        }
+        if (typeof result === "number" && result < min){
+            min = result;
+        }
+    }
+    return min;
+}
+
+function GraphIDAstar(initial:State,goal:State,yard:Yard):myNode | null | number{
+    //turn the intitial state into the root node
+    let root:myNode = {
+        state:initial,
+        parent: null,
+        action:null,
+        depth:0
+    };
+
+    let limit = heuristic(initial,goal);
+
+    //call depth limited search for a series of limits 
+    while(true){
+        let visited = new Map<string, number>();
+        let result = AStarGraphSearch(root,goal,yard,limit,visited);
+        if (result === null){
+            return null;
+        }
+        if (typeof result != "number"){
+            return result
+        }
+        //increase the limit since result would be a number
+        limit = result;
+    }
+    return null;
+}
+
+function howToGetToGoalGraphIDAStar(yard:Yard,initial:State,goal:State):Action[]{
+    let actions:Action[] = [];
+    let goalNode = GraphIDAstar(initial,goal,yard);
+    //if unable to reach goal node, return an empty set of actions
+    if (goalNode === null){
+        console.log("Goal not found");
+        return [];
+    }
+    //start at the goal node and work backwards to find path of actions
+    if (typeof goalNode != "number"){
+        let current:myNode | null= goalNode;
+        while (current && current.action !== null){
+            //put the action at the front of the action list 
+            actions.unshift(current.action);
+            current = current.parent;
+        }
+    }
+    console.log("The actions to get to the goal state are: ", actions)
+    return actions; 
+}
+
+console.log("Yard 4 - Example Yard 3");
+howToGetToGoalGraphIDAStar(YARD_4,STATE_4,GOAL_STATE_4);
+console.log("Yard 5 - Example Yard 4");
+howToGetToGoalGraphIDAStar(YARD_5,STATE_5,GOAL_STATE_5);
+console.log("Yard 6 - Example Yard 5");
+howToGetToGoalGraphIDAStar(YARD_6,STATE_6,GOAL_STATE_6);
+console.log("Yard 7 - Example Yard 2");
+howToGetToGoalGraphIDAStar(YARD_7,STATE_7,GOAL_STATE_7);
