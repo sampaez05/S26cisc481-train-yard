@@ -199,7 +199,9 @@ const GOAL_STATE_7: State = [
     []
 ];
 
+//problem 1
 
+//helper function that finds which track the engine is on 
 function checkForEngine(state:State):number{
     for (let i=0; i< state.length; i++){
         if (state[i].includes("*")){
@@ -223,15 +225,15 @@ function possibleActions(yard:Yard, state:State):Action[]{
     };
     //check every track in the yard 
     for (let track in yard){
-        const xTrack = Number(track);
-        const connections = yard[xTrack];
+        const xTrack = Number(track); 
+        const connections = yard[xTrack]; //yards connected to the given track, xTrack
 
-        //check all tracks connected to the given track
+        //for all tracks connected to the given track
         for (const yTrack of connections){
 
             // if the engine is on the given track, xTrack
             if (engineTrack === xTrack){
-                //check what items are on that given track
+                //check what items are on the given track
                 const trackItems = state[xTrack-1];
                 // if the rightmost item of the given track is a car, it can be moved right to the connecting track
                 if (trackItems.some(item => item != '*')){
@@ -273,10 +275,10 @@ function possibleActions(yard:Yard, state:State):Action[]{
             }
         }
     }
+    //console.log("The actions are: ", actions);
     return actions;
 }
-//Test to see if it worked:
-
+//Test examples for problem 1
 console.log("Yard 1, State 1: ")
 possibleActions(YARD_1,STATE_1);
 console.log("Yard 1, State 1_5: ")
@@ -305,7 +307,6 @@ function result(action:Action, state:State):State{
     let toTrack = newState[to - 1];
     //find index of the engine
     const engineTrack = checkForEngine(state);
-    const engineIndex = newState[engineTrack - 1].indexOf("*");
     if (direction == "LEFT"){
         // remove leftmost car from the start of the from track
         let movedCar = fromTrack.shift();
